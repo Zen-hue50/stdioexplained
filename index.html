@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StdioExplained.com — C Standard Library Functions in Plain English</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .function-card {
+            scroll-margin-top: 100px;
+        }
+        pre {
+            background: #1e1e2e;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+        .comment { color: #5c6370; }
+        .type { color: #e5c07b; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="#" class="text-xl font-bold">
+                <span class="gradient-text">&lt;stdio&gt;</span><span class="text-gray-600">Explained</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Search functions..." 
+                        class="pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-48 md:w-64 text-sm">
+                    <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-20 px-4 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6">
+                C Standard Library Functions<br>
+                <span class="gradient-text">in Plain English</span>
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Not just syntax — real-world analogies, common pitfalls, and the stories behind each function. 
+                Finally understand what <code class="bg-white px-2 py-1 rounded text-purple-600">malloc</code> actually does.
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="#memory" class="px-4 py-2 bg-white rounded-full shadow-md hover:shadow-lg transition font-medium text-gray-700">🧠 Memory</a>
+                <a href="#io" class="px-4 py-2 bg-white rounded-full shadow-md hover:shadow-lg transition font-medium text-gray-700">📄 I/O</a>
+                <a href="#strings" class="px-4 py-2 bg-white rounded-full shadow-md hover:shadow-lg transition font-medium text-gray-700">📝 Strings</a>
+                <a href="#utility" class="px-4 py-2 bg-white rounded-full shadow-md hover:shadow-lg transition font-medium text-gray-700">🔧 Utility</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-16">
+        
+        <!-- Memory Section -->
+        <section id="memory" class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="text-4xl">🧠</span>
+                <h2 class="text-3xl font-bold text-gray-800">Memory Management</h2>
+            </div>
+            
+            <!-- malloc -->
+            <div id="malloc" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">malloc()</code>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">stdlib.h</span>
+                    <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">⚠️ Must free()</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>🧱</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like renting a storage unit:</strong> You walk into a storage facility and say "I need 100 square feet." 
+                            They give you a key (pointer) to unit #47. The space is yours to use however you want — but it's <em>not cleaned first</em> 
+                            (previous renter's junk might still be there). And crucially: <strong>you must return the key when done</strong>, or you'll keep paying forever.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Allocates <code class="bg-gray-100 px-1 rounded">size</code> bytes of uninitialized memory on the heap. 
+                            Returns a pointer to the beginning of the block, or <code class="bg-gray-100 px-1 rounded">NULL</code> if it fails.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">void</span>* <span class="function">malloc</span>(<span class="type">size_t</span> size);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">int</span>* arr = <span class="function">malloc</span>(<span class="number">10</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));
+<span class="keyword">if</span> (arr == <span class="number">NULL</span>) {
+    <span class="comment">// Handle allocation failure</span>
+    <span class="keyword">return</span> <span class="number">-1</span>;
+}
+<span class="comment">// Use arr...</span>
+<span class="function">free</span>(arr);  <span class="comment">// Don't forget!</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Pitfalls</h3>
+                    <ul class="text-red-700 space-y-2 text-sm">
+                        <li><strong>Memory leak:</strong> Forgetting to <code>free()</code> — your program slowly eats all available RAM</li>
+                        <li><strong>Using uninitialized memory:</strong> malloc doesn't zero the memory — you'll get garbage values</li>
+                        <li><strong>Double free:</strong> Calling <code>free()</code> twice on the same pointer — undefined behavior, often crashes</li>
+                        <li><strong>Not checking NULL:</strong> If allocation fails and you use the pointer anyway — instant crash</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- calloc -->
+            <div id="calloc" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">calloc()</code>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">stdlib.h</span>
+                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">✓ Zero-initialized</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>🏨</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like booking a hotel room:</strong> Unlike the storage unit (malloc), when you check into a hotel, 
+                            housekeeping has already cleaned everything. The bed is made, surfaces wiped down, everything is fresh and <em>zeroed out</em>. 
+                            It costs a tiny bit more (slower), but you know exactly what you're getting.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Allocates memory for an array of <code class="bg-gray-100 px-1 rounded">n</code> elements, 
+                            each of <code class="bg-gray-100 px-1 rounded">size</code> bytes, and <strong>initializes all bytes to zero</strong>.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">void</span>* <span class="function">calloc</span>(<span class="type">size_t</span> n, <span class="type">size_t</span> size);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="comment">// Array of 10 ints, all set to 0</span>
+<span class="type">int</span>* arr = <span class="function">calloc</span>(<span class="number">10</span>, <span class="keyword">sizeof</span>(<span class="type">int</span>));
+<span class="comment">// arr[0] through arr[9] are all 0</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-2">💡 Pro Tip</h3>
+                    <p class="text-blue-700 text-sm">Use <code>calloc</code> when you need zeroed memory (like initializing counters or flags). Use <code>malloc</code> when you'll immediately overwrite everything anyway — it's slightly faster.</p>
+                </div>
+            </div>
+
+            <!-- free -->
+            <div id="free" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">free()</code>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">stdlib.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>🔑</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Returning your storage unit key:</strong> You're done with the unit, so you hand back the key. 
+                            The storage company can now rent that space to someone else. But here's the catch: 
+                            <em>you still remember where the unit was</em>. If you try to sneak back in, you might find someone else's stuff — or set off alarms.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Deallocates memory previously allocated by <code class="bg-gray-100 px-1 rounded">malloc</code>, 
+                            <code class="bg-gray-100 px-1 rounded">calloc</code>, or <code class="bg-gray-100 px-1 rounded">realloc</code>. 
+                            The pointer becomes invalid after this call.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">void</span> <span class="function">free</span>(<span class="type">void</span>* ptr);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Safe Pattern</h3>
+                        <pre class="p-4 text-sm"><code><span class="function">free</span>(ptr);
+ptr = <span class="number">NULL</span>;  <span class="comment">// Prevent use-after-free</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Pitfalls</h3>
+                    <ul class="text-red-700 space-y-2 text-sm">
+                        <li><strong>Use-after-free:</strong> Accessing memory after freeing it — undefined behavior, security vulnerability</li>
+                        <li><strong>Double free:</strong> Freeing the same pointer twice — crashes or heap corruption</li>
+                        <li><strong>Freeing stack memory:</strong> Only free what malloc/calloc/realloc gave you!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- realloc -->
+            <div id="realloc" class="function-card bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">realloc()</code>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">stdlib.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📦</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Upgrading (or downgrading) your storage unit:</strong> You rented a 10x10 unit, but now you need 20x20. 
+                            The facility might: (1) expand your current unit if there's room next door, or (2) move all your stuff to a bigger unit elsewhere. 
+                            Either way, your stuff is preserved — but <em>your key might change</em>.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Resizes a previously allocated memory block. May move the block to a new location (copying existing data). 
+                            Returns the new pointer, or NULL on failure <em>without freeing the original</em>.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">void</span>* <span class="function">realloc</span>(<span class="type">void</span>* ptr, <span class="type">size_t</span> new_size);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Safe Pattern</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">int</span>* tmp = <span class="function">realloc</span>(arr, new_size);
+<span class="keyword">if</span> (tmp == <span class="number">NULL</span>) {
+    <span class="comment">// Handle error - arr is still valid!</span>
+} <span class="keyword">else</span> {
+    arr = tmp;  <span class="comment">// Update pointer</span>
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ The Classic Mistake</h3>
+                    <p class="text-red-700 text-sm"><code>arr = realloc(arr, new_size);</code> — If realloc fails, you've just lost your only pointer to the original memory. Memory leak! Always use a temporary variable.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- I/O Section -->
+        <section id="io" class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="text-4xl">📄</span>
+                <h2 class="text-3xl font-bold text-gray-800">Input/Output</h2>
+            </div>
+
+            <!-- printf -->
+            <div id="printf" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">printf()</code>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">stdio.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>🖨️</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like a mail merge template:</strong> You have a letter with blanks: "Dear ___, your order #___ ships on ___." 
+                            You provide the values, and printf fills them in and sends it to the screen. 
+                            The <code>%</code> placeholders are your blanks, and the extra arguments are the values.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Writes formatted output to stdout. The format string contains text and format specifiers 
+                            (<code>%d</code>, <code>%s</code>, <code>%f</code>, etc.) that get replaced with the provided arguments.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Common Format Specifiers</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+                            <code class="bg-gray-100 p-2 rounded">%d</code><span class="p-2">int</span>
+                            <code class="bg-gray-100 p-2 rounded">%s</code><span class="p-2">string</span>
+                            <code class="bg-gray-100 p-2 rounded">%f</code><span class="p-2">float/double</span>
+                            <code class="bg-gray-100 p-2 rounded">%c</code><span class="p-2">char</span>
+                            <code class="bg-gray-100 p-2 rounded">%p</code><span class="p-2">pointer</span>
+                            <code class="bg-gray-100 p-2 rounded">%x</code><span class="p-2">hex</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="function">printf</span>(<span class="string">"Hello, %s! You are %d years old.\n"</span>, 
+       name, age);</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Pitfalls</h3>
+                    <ul class="text-red-700 space-y-2 text-sm">
+                        <li><strong>Format string mismatch:</strong> Using <code>%d</code> for a string = crash or garbage</li>
+                        <li><strong>Missing arguments:</strong> More <code>%</code> specifiers than arguments = undefined behavior</li>
+                        <li><strong>User-controlled format string:</strong> Never do <code>printf(user_input)</code> — serious security vulnerability!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- scanf -->
+            <div id="scanf" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">scanf()</code>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">stdio.h</span>
+                    <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">⚡ Use with caution</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📋</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like a form with specific boxes:</strong> You have a form that says "Enter a number: [___]". 
+                            scanf reads input and tries to fit it into your expected format. But it's picky — if someone writes "abc" 
+                            in the number box, it gets confused and leaves junk in the input stream.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Reads formatted input from stdin according to the format string. 
+                            Stores results in the addresses you provide. Returns the number of successfully matched items.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">int</span> <span class="function">scanf</span>(<span class="type">const char</span>* format, ...);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">int</span> age;
+<span class="type">char</span> name[<span class="number">50</span>];
+<span class="function">scanf</span>(<span class="string">"%d"</span>, &age);      <span class="comment">// Note the &</span>
+<span class="function">scanf</span>(<span class="string">"%49s"</span>, name);   <span class="comment">// No & for arrays</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Pitfalls</h3>
+                    <ul class="text-red-700 space-y-2 text-sm">
+                        <li><strong>Forgetting &:</strong> <code>scanf("%d", x)</code> instead of <code>scanf("%d", &x)</code> = crash</li>
+                        <li><strong>Buffer overflow:</strong> <code>scanf("%s", buf)</code> has no limit — use <code>%49s</code> for 50-char buffer</li>
+                        <li><strong>Leftover newline:</strong> After reading a number, <code>\n</code> stays in buffer — messes up next read</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- fopen -->
+            <div id="fopen" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">fopen()</code>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">stdio.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📂</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like checking out a library book:</strong> You go to the desk, give them the book's location (filename), 
+                            and say what you want to do — read it, write notes in it, or start a fresh notebook. 
+                            They give you a library card (FILE pointer) to access it. When done, you must return it (fclose).
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Opens a file and returns a FILE pointer for subsequent operations. 
+                            The mode determines read/write/append behavior.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Modes</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+                            <code class="bg-gray-100 p-2 rounded">"r"</code><span class="p-2">Read (must exist)</span>
+                            <code class="bg-gray-100 p-2 rounded">"w"</code><span class="p-2">Write (truncates!)</span>
+                            <code class="bg-gray-100 p-2 rounded">"a"</code><span class="p-2">Append</span>
+                            <code class="bg-gray-100 p-2 rounded">"r+"</code><span class="p-2">Read + Write</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">FILE</span>* fp = <span class="function">fopen</span>(<span class="string">"data.txt"</span>, <span class="string">"r"</span>);
+<span class="keyword">if</span> (fp == <span class="number">NULL</span>) {
+    <span class="function">perror</span>(<span class="string">"Failed to open"</span>);
+    <span class="keyword">return</span> <span class="number">1</span>;
+}
+<span class="comment">// Use file...</span>
+<span class="function">fclose</span>(fp);</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Pitfalls</h3>
+                    <ul class="text-red-700 space-y-2 text-sm">
+                        <li><strong>"w" destroys data:</strong> Opening with "w" immediately erases the file — use "a" to append</li>
+                        <li><strong>Not checking NULL:</strong> File might not exist, or you lack permissions</li>
+                        <li><strong>Forgetting fclose:</strong> Resource leak, and data might not be written (buffered)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- fgets -->
+            <div id="fgets" class="function-card bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">fgets()</code>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">stdio.h</span>
+                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">✓ Safe choice</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📏</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like reading with a ruler:</strong> You're copying text from one book to another, but your line 
+                            can only hold 80 characters. You read until you hit a newline OR run out of space, whichever comes first. 
+                            Unlike the reckless <code>gets()</code>, you'll never overflow.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Reads up to n-1 characters from a stream into a buffer, stopping at newline or EOF. 
+                            Always null-terminates. The newline IS included if there's room.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">char</span>* <span class="function">fgets</span>(<span class="type">char</span>* str, <span class="type">int</span> n, <span class="type">FILE</span>* stream);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">char</span> line[<span class="number">100</span>];
+<span class="keyword">while</span> (<span class="function">fgets</span>(line, <span class="keyword">sizeof</span>(line), fp)) {
+    <span class="comment">// Process each line</span>
+    <span class="function">printf</span>(<span class="string">"%s"</span>, line);
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-2">💡 Pro Tip</h3>
+                    <p class="text-blue-700 text-sm">Use <code>fgets(buf, size, stdin)</code> instead of <code>scanf("%s")</code> for user input. It's buffer-overflow safe and handles spaces properly.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strings Section -->
+        <section id="strings" class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="text-4xl">📝</span>
+                <h2 class="text-3xl font-bold text-gray-800">String Operations</h2>
+            </div>
+
+            <!-- strlen -->
+            <div id="strlen" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">strlen()</code>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">string.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📐</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like walking until you hit a wall:</strong> You start at the beginning of a hallway and count your steps 
+                            until you reach the dead end (<code>\0</code> null terminator). The wall isn't counted — just the steps to get there.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Returns the length of a string (number of characters before the null terminator). 
+                            Does NOT include the null terminator in the count.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">char</span>* s = <span class="string">"Hello"</span>;
+<span class="type">size_t</span> len = <span class="function">strlen</span>(s);  <span class="comment">// 5</span>
+
+<span class="comment">// Buffer needs len + 1 for \0</span>
+<span class="type">char</span>* copy = <span class="function">malloc</span>(len + <span class="number">1</span>);</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Pitfall</h3>
+                    <p class="text-red-700 text-sm">If the string isn't null-terminated, strlen walks off into random memory until it finds a zero byte (or crashes). Always ensure strings are properly terminated!</p>
+                </div>
+            </div>
+
+            <!-- strcpy -->
+            <div id="strcpy" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">strcpy()</code>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">string.h</span>
+                    <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">⚠️ Unsafe</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📋</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like a reckless photocopier:</strong> It copies everything from the source until it hits the null terminator, 
+                            and pastes it to the destination — <em>without checking if there's enough paper</em>. 
+                            If the destination is too small, it just keeps writing past the end. Chaos ensues.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Copies the source string (including null terminator) to the destination. 
+                            <strong>Does not check bounds</strong> — you must ensure dest is large enough.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Dangerous Pattern</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">char</span> buf[<span class="number">10</span>];
+<span class="function">strcpy</span>(buf, user_input); <span class="comment">// 💥 BOOM</span></code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Safer Alternative</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">char</span> buf[<span class="number">10</span>];
+<span class="function">strncpy</span>(buf, src, <span class="keyword">sizeof</span>(buf) - <span class="number">1</span>);
+buf[<span class="keyword">sizeof</span>(buf) - <span class="number">1</span>] = <span class="string">'\0'</span>;</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Security Alert</h3>
+                    <p class="text-red-700 text-sm">Buffer overflows via strcpy are a classic security vulnerability. Prefer <code>strncpy</code>, <code>strlcpy</code> (BSD/macOS), or <code>snprintf</code> for safe copying.</p>
+                </div>
+            </div>
+
+            <!-- strcmp -->
+            <div id="strcmp" class="function-card bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">strcmp()</code>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">string.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>⚖️</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like alphabetizing books:</strong> You compare two titles letter by letter. "Apple" vs "Banana" — 
+                            A comes before B, so "Apple" is "less than" "Banana". If they're identical, you get 0. 
+                            The return value tells you the ordering, not just equality.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Compares two strings lexicographically. Returns negative if s1 &lt; s2, zero if equal, positive if s1 &gt; s2.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Return Values</h3>
+                        <div class="text-sm mb-4 space-y-2">
+                            <div class="flex items-center gap-3"><code class="bg-gray-100 px-2 py-1 rounded">< 0</code><span>s1 comes before s2</span></div>
+                            <div class="flex items-center gap-3"><code class="bg-gray-100 px-2 py-1 rounded">= 0</code><span>strings are equal</span></div>
+                            <div class="flex items-center gap-3"><code class="bg-gray-100 px-2 py-1 rounded">> 0</code><span>s1 comes after s2</span></div>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="keyword">if</span> (<span class="function">strcmp</span>(password, <span class="string">"secret"</span>) == <span class="number">0</span>) {
+    <span class="comment">// Match!</span>
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Mistake</h3>
+                    <p class="text-red-700 text-sm"><code>if (strcmp(a, b))</code> is TRUE when strings are DIFFERENT! Use <code>== 0</code> to check for equality: <code>if (strcmp(a, b) == 0)</code></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Utility Section -->
+        <section id="utility" class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="text-4xl">🔧</span>
+                <h2 class="text-3xl font-bold text-gray-800">Utility Functions</h2>
+            </div>
+
+            <!-- qsort -->
+            <div id="qsort" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">qsort()</code>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">stdlib.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>🎴</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like hiring a card sorter:</strong> You have a deck of custom cards and hire someone to sort them. 
+                            They don't know what the cards mean, so you give them a rule: "Given any two cards, tell me which comes first." 
+                            That's your comparison function. They handle the rest.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Sorts an array in-place using quicksort (usually). You provide a comparison function that takes two 
+                            <code>const void*</code> pointers and returns negative/zero/positive.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">void</span> <span class="function">qsort</span>(<span class="type">void</span>* base, <span class="type">size_t</span> n, 
+           <span class="type">size_t</span> size,
+           <span class="type">int</span> (*cmp)(<span class="type">const void</span>*, <span class="type">const void</span>*));</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">int</span> <span class="function">cmp</span>(<span class="type">const void</span>* a, <span class="type">const void</span>* b) {
+    <span class="keyword">return</span> *(<span class="type">int</span>*)a - *(<span class="type">int</span>*)b;
+}
+<span class="function">qsort</span>(arr, n, <span class="keyword">sizeof</span>(<span class="type">int</span>), cmp);</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Gotcha</h3>
+                    <p class="text-red-700 text-sm">The subtraction trick <code>a - b</code> can overflow for large integers! For bulletproof code, use explicit comparisons: <code>return (a > b) - (a < b);</code></p>
+                </div>
+            </div>
+
+            <!-- memcpy -->
+            <div id="memcpy" class="function-card bg-white rounded-2xl shadow-lg p-8 mb-6 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">memcpy()</code>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">string.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>🚚</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like a moving truck:</strong> You tell them "pick up exactly 50 boxes from warehouse A 
+                            and drop them at warehouse B." They don't care what's in the boxes — they just move raw bytes. 
+                            But if the warehouses overlap, boxes might get jumbled (use <code>memmove</code> instead).
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Copies n bytes from source to destination. Fast, but source and destination must NOT overlap. 
+                            For overlapping regions, use <code>memmove()</code>.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">void</span>* <span class="function">memcpy</span>(<span class="type">void</span>* dest, <span class="type">const void</span>* src, 
+             <span class="type">size_t</span> n);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">struct</span> Person p1 = {<span class="string">"Alice"</span>, <span class="number">30</span>};
+<span class="type">struct</span> Person p2;
+<span class="function">memcpy</span>(&p2, &p1, <span class="keyword">sizeof</span>(Person));</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-2">💡 memcpy vs memmove</h3>
+                    <p class="text-blue-700 text-sm"><code>memcpy</code> = faster but no overlap allowed. <code>memmove</code> = slightly slower but handles overlapping memory safely. When in doubt, use <code>memmove</code>.</p>
+                </div>
+            </div>
+
+            <!-- memset -->
+            <div id="memset" class="function-card bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <code class="text-2xl font-semibold text-purple-600">memset()</code>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">string.h</span>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>🎨</span> The Analogy
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <strong>Like a paint roller:</strong> You dip it in one color and roll it across a wall. 
+                            Every inch gets the same color. memset does this with bytes — fills a region with a single byte value. 
+                            Perfect for zeroing memory or setting sentinel values.
+                        </p>
+                        
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <span>📖</span> What It Does
+                        </h3>
+                        <p class="text-gray-600">
+                            Sets n bytes of memory to a specific byte value. Commonly used to zero out arrays or structures.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Syntax</h3>
+                        <pre class="p-4 text-sm mb-4"><code><span class="type">void</span>* <span class="function">memset</span>(<span class="type">void</span>* ptr, <span class="type">int</span> value, <span class="type">size_t</span> n);</code></pre>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Example</h3>
+                        <pre class="p-4 text-sm"><code><span class="type">char</span> buf[<span class="number">100</span>];
+<span class="function">memset</span>(buf, <span class="number">0</span>, <span class="keyword">sizeof</span>(buf)); <span class="comment">// Zero it out</span>
+
+<span class="type">int</span> flags[<span class="number">50</span>];
+<span class="function">memset</span>(flags, <span class="number">-1</span>, <span class="keyword">sizeof</span>(flags)); <span class="comment">// All 0xFF</span></code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ Common Mistake</h3>
+                    <p class="text-red-700 text-sm">Only use memset for 0 or -1 on integers! <code>memset(arr, 5, ...)</code> fills each <em>byte</em> with 5, not each int. An int becomes 0x05050505, not 5.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="mb-16">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-8 text-white">
+                <h2 class="text-2xl font-bold mb-6">📚 Quick Reference Card</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-3 opacity-90">Memory (stdlib.h)</h3>
+                        <ul class="space-y-2 text-sm opacity-80">
+                            <li><code>malloc(size)</code> — get raw memory</li>
+                            <li><code>calloc(n, size)</code> — zeroed array</li>
+                            <li><code>realloc(ptr, size)</code> — resize</li>
+                            <li><code>free(ptr)</code> — release memory</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-3 opacity-90">I/O (stdio.h)</h3>
+                        <ul class="space-y-2 text-sm opacity-80">
+                            <li><code>printf(fmt, ...)</code> — formatted output</li>
+                            <li><code>scanf(fmt, ...)</code> — formatted input</li>
+                            <li><code>fopen(path, mode)</code> — open file</li>
+                            <li><code>fgets(buf, n, f)</code> — safe line read</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-3 opacity-90">Strings (string.h)</h3>
+                        <ul class="space-y-2 text-sm opacity-80">
+                            <li><code>strlen(s)</code> — length</li>
+                            <li><code>strcpy(d, s)</code> — copy (unsafe!)</li>
+                            <li><code>strcmp(a, b)</code> — compare</li>
+                            <li><code>memcpy(d, s, n)</code> — binary copy</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-lg font-semibold text-white mb-2">&lt;stdio&gt;Explained</p>
+            <p class="text-sm mb-6">C standard library functions explained in plain English</p>
+            <p class="text-xs">Made with ☕ for C programmers everywhere</p>
+        </div>
+    </footer>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const functionCards = document.querySelectorAll('.function-card');
+        
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            functionCards.forEach(card => {
+                const functionName = card.id.toLowerCase();
+                const content = card.textContent.toLowerCase();
+                
+                if (functionName.includes(query) || content.includes(query)) {
+                    card.style.display = 'block';
+                    if (query && functionName.includes(query)) {
+                        card.style.order = '-1';
+                    } else {
+                        card.style.order = '0';
+                    }
+                } else {
+                    card.style.display = query ? 'none' : 'block';
+                }
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section in view
+        const sections = document.querySelectorAll('section[id]');
+        
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '-100px 0px -50% 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    document.querySelectorAll('nav a').forEach(link => {
+                        link.classList.remove('text-purple-600', 'font-semibold');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('text-purple-600', 'font-semibold');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>
